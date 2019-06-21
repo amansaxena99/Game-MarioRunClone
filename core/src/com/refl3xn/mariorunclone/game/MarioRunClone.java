@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Intersector;
 import com.badlogic.gdx.math.Rectangle;
@@ -21,6 +22,9 @@ public class MarioRunClone extends ApplicationAdapter {
 	float gravity = 0.4f, velocity = 0;
 	int manY = 0;
 
+	int blink = 0;
+	BitmapFont startfont;
+	GlyphLayout glyphLayout;
 	int score = 0;
 	BitmapFont scorefont;
 
@@ -37,6 +41,7 @@ public class MarioRunClone extends ApplicationAdapter {
 	int bombCount = 0;
 
 	int gameState = 0;
+	int gameOverPause = 0;
 
 	public void makeCoin(){
 		float rand = random.nextFloat();
@@ -75,7 +80,10 @@ public class MarioRunClone extends ApplicationAdapter {
 		scorefont = new BitmapFont();
 		scorefont.setColor(Color.WHITE);
 		scorefont.getData().setScale(10);
-
+		startfont = new BitmapFont();
+		startfont.setColor(Color.WHITE);
+		startfont.getData().setScale(6);
+		glyphLayout = new GlyphLayout();
 		gameState = 0;
 	}
 
@@ -86,6 +94,13 @@ public class MarioRunClone extends ApplicationAdapter {
 
 		if (gameState == 0){
 			//Going to Start
+			blink++;
+			if (blink < 30) {
+				glyphLayout.setText(startfont, "Touch to Start");
+				startfont.draw(batch, glyphLayout, (Gdx.graphics.getWidth() / 2) - (glyphLayout.width / 2), 500);
+			} else if (blink > 70){
+				blink = 0;
+			}
 			if (Gdx.input.justTouched()){
 				gameState = 1;
 			}
@@ -153,7 +168,16 @@ public class MarioRunClone extends ApplicationAdapter {
 		} else if (gameState == 2){
 			//Game Over
 			manState = 4;
-			if (Gdx.input.justTouched()){
+			blink++;
+			if (blink < 30) {
+				glyphLayout.setText(startfont, "     Game  Over     \nTouch to Start Again");
+				startfont.draw(batch, glyphLayout, (Gdx.graphics.getWidth() / 2) - (glyphLayout.width / 2), 500);
+			} else if (blink > 70){
+				blink = 0;
+			}
+			gameOverPause++;
+			if (Gdx.input.justTouched() && gameOverPause > 40){
+				gameOverPause = 0;
 				gameState = 1;
 				score = 0;
 				velocity = 0;
